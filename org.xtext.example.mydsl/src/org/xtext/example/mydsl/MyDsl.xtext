@@ -1,0 +1,30 @@
+grammar org.xtext.example.mydsl.MyDSL with org.eclipse.xtext.xbase.annotations.XbaseWithAnnotations
+
+generate myDSL "http://www.xtex.org/exmaple/mydsl/MyDSL"
+
+Model:
+	importSection=XImportSection?
+	'default'
+	'{'
+		(entityAnnotations+=XAnnotation*
+			'entity' '{' '}'
+		)?
+	'}'
+
+	(packages+=PackageType)*
+;
+
+PackageType:
+	importSection=XImportSection?
+	'package' importedNamespace=QualifiedName '{'
+		(domains += DomainType)*
+	'}'
+;
+
+DomainType:
+	'domain' name=ID (accessibility = ('is immutable' | 'is filterable'))? '{'
+		entityAnnotations+=XAnnotation*
+		'entity' (isWithoutEntityMapping?='without entity-mapping')? ('for table' tableName=STRING)? ('extends' parent=[DomainType])? '{'
+		'}'
+	'}'
+;

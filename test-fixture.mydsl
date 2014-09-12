@@ -1,0 +1,13 @@
+default {
+	entity {
+		
+	}
+}
+
+package de.test {
+	domain MyDomain {
+		entity {
+			
+		}
+	}
+}
