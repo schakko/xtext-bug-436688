@@ -21,6 +21,11 @@ import org.xtext.example.mydsl.myDSL.PackageType
 class MyDSLJvmModelInferrer extends AbstractModelInferrer {
 	@Inject extension IQualifiedNameProvider
 
+/*
+    DON'T DO THIS! 
+    The extension fields are declared in super class already and in contrast to the code here, they are initialized proberly.
+    Here, guice will create empty unconfigured resource sets. As a consequence a NullJdtTypeProvider will be used.
+    
 	extension JvmTypeReferenceBuilder jvmTypeReferenceBuilder
 
 	extension JvmAnnotationReferenceBuilder jvmAnnotationReferenceBuilder
@@ -33,7 +38,7 @@ class MyDSLJvmModelInferrer extends AbstractModelInferrer {
 		XtextResourceSet resourceSet) {
 		this.jvmAnnotationReferenceBuilder = factory.create(resourceSet)
 	}
-
+*/
 	/**
      * convenience API to build and initialize JVM types and their members.
      */
@@ -42,7 +47,8 @@ class MyDSLJvmModelInferrer extends AbstractModelInferrer {
 	def dispatch void infer(Model element, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		for (pkg : element.packages) {
 			for (domain : pkg.domains) {
-				domain.toClass(pkg.importedNamespace + ".entity." + domain.name,
+				// add the created type to the acceptor, and pass the initialization as a second argument to accept.
+				acceptor.accept(domain.toClass(pkg.importedNamespace + ".entity." + domain.name))
 					[
 						addAnnotations(it, element.entityAnnotations)
 						if (!domain.isWithoutEntityMapping) {
@@ -56,7 +62,7 @@ class MyDSLJvmModelInferrer extends AbstractModelInferrer {
 								append('''// default constructor''')
 							]
 						]
-					])
+					]
 			}
 		}
 	}
